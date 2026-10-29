@@ -26,7 +26,7 @@ namespace LibraryApp
 
         public void AddBook(Book book)
         {
-            // ОШИБКА 1: Если передать книгу с уже существующим Id, она просто добавится в список.
+            if (book == null) throw new ArgumentNullException(nameof(book));
             book.Id = _nextId++;
             _books.Add(book);
             Console.WriteLine($"Книга '{book.Title}' добавлена в библиотеку.");
@@ -34,10 +34,13 @@ namespace LibraryApp
 
         public void BorrowBook(int id)
         {
-            // ОШИБКА 2: Отсутствует проверка на существование книги (FindBook может вернуть null).
-            // ОШИБКА 3: Если книга не найдена, приложение упадет на следующей строке.
-            Book book = _books.Find(b => b.Id == id);
 
+            Book book = _books.Find(b => b.Id == id);
+            if (book == null)
+            {
+                Console.WriteLine($"Ошибка: Книга с ID {id} не найдена в библиотеке.");
+                return;
+            }
             if (book.IsAvailable)
             {
                 book.IsAvailable = false;
@@ -51,11 +54,21 @@ namespace LibraryApp
 
         public void ReturnBook(int id)
         {
-            // ОШИБКА 4: Аналогично BorrowBook, нет проверки на существование книги.
-            // ОШИБКА 5: Метод вернет книгу вне зависимости от того, была ли она выдана.
             Book book = _books.Find(b => b.Id == id);
-            book.IsAvailable = true;
-            Console.WriteLine($"Книга '{book.Title}' возвращена в библиотеку.");
+            if (book == null)
+            {
+                Console.WriteLine($"Ошибка: Книга с ID {id} не найдена в библиотеке.");
+                return;
+            }
+            if (!book.IsAvailable)
+            {
+                book.IsAvailable = true;
+                Console.WriteLine($"Книга '{book.Title}' успешно возвращена в библиотеку.");
+            }
+            else
+            {
+                Console.WriteLine($"Информация: Книга '{book.Title}' уже находится в библиотеке и не требует возврата.");
+            }
         }
 
         public Book FindBook(int id)
@@ -93,12 +106,12 @@ namespace LibraryApp
             Console.WriteLine("--- Пытаемся выдать ту же книгу (ID 1) повторно ---");
             library.BorrowBook(1);
 
-            Console.WriteLine("--- Возвращаем книгу (ID 1) ---");
-            library.ReturnBook(1);
+            Console.WriteLine("--- Возвращаем книгу (ID 3) которая не была выдана ---");
+            library.ReturnBook(3);
             library.ListBooks();
 
             Console.WriteLine("--- Пытаемся выдать несуществующую книгу (ID 99) ---");
-            library.BorrowBook(99); // Здесь приложение упадет
+            library.BorrowBook(99); 
 
             Console.ReadKey();
         }
