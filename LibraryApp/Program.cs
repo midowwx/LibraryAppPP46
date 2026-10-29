@@ -16,7 +16,7 @@ namespace LibraryApp
 
     public class Library
     {
-        private List<Book> _books;
+        private readonly List<Book> _books;
         private int _nextId = 1; 
 
         public Library()
@@ -89,7 +89,7 @@ namespace LibraryApp
     }
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             Library library = new Library();
 
